@@ -25,11 +25,60 @@ a1
 
 import java.io.IOException;
 
-public class Main {
-    public static void main(String[] args)  {
-        String a1 = "1";
-     
+import java.util.*;
 
-     
+public class Main {
+    public static void main(String[] args) {
+        DataInput dataInput = new DataInput(); 
+        // Масив для зберігання пар <key> та <value>
+        String[][] data = new String[10000][2]; 
+        int dataSize = 0; 
+
+   
+        while (true) {
+            String line = dataInput.getString(); 
+            if (line.isEmpty()) {
+                break; 
+            }
+
+            //розбиваємо рядок за допомогою регулярних виразів на частини
+            String[] parts = line.split(" ");
+            // Зберегти ключ
+            data[dataSize][0] = parts[0]; 
+
+            // Зберегти значення
+            data[dataSize][1] = parts[1]; 
+            dataSize++;
+        }
+
+        // Обчислення середніх значень та підготовка даних для сортування
+        String[][] averages = new String[10000][2];
+        int averagesSize = 0;
+
+        for (int i = 0; i < dataSize; i++) {
+            String key = data[i][0];
+            int value = Integer.parseInt(data[i][1]);
+            double sum = value;
+            int count = 1;
+
+            // Знайти всі значення для даного ключа та обчислити їх суму та кількість
+            for (int j = i + 1; j < dataSize; j++) {
+                if (data[j][0].equals(key)) {
+                    sum += Integer.parseInt(data[j][1]);
+                    count++;
+                    i++;
+                }
+            }
+
+            // Обчислити середнє значення
+            double average = sum / count;
+
+            // Зберегти пару <key, average>
+            averages[averagesSize][0] = key;
+            averages[averagesSize][1] = Double.toString(average);
+            averagesSize++;
+        }
+
+       
     }
 }
