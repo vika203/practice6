@@ -1,35 +1,55 @@
-/*
-
-Постановка задачі
-
-Прочитати з stdin N рядків до появи EOF (максимум 10000 рядків).
-Рядки розділяються АБО послідовністю байтів 0x0D та 0x0A (CR LF), або одним символом - 0x0D чи 0x0A.
-Кожен рядок це пара "<key> <value>" (розділяються пробілом), де ключ - це текстовий ідентифікатор макс 16 символів
- (будь-які символи окрім white space chars - пробілу чи переводу на новий рядок), 
- а значення - це десяткове ціле знакове число в діапазоні [-10000, 10000]. 
-Провести групування: заповнити два масиви (або масив структур з 2х значень) для зберігання пари <key> та <average> ,
- які будуть включати лише унікальні значення <key> а <average> - це средне значення, обраховане для всіх <value>,
-  що відповідають конкретному значенню <key>.
-Відсортувати алгоритмом merge sort за <average>, та вивести в stdout  значення key від більших до менших (average desc),
- кожен key окремим рядком.
-Наприклад:
-a1 1
-a1 2
-a1 3
-a2 0
-a2 10 
-Результат (average для a2=(0+10)/2=5, для a1=(1+2+3)/3 = 2):
-a2
-a1
- */
-
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 
-public class Main {
-    public static void main(String[] args)  {
-        String a1 = "1";
-     
+public final class DataInput {
 
-     
+    public static Double getDouble(String message) {
+        System.out.println(message);
+        Double value = null;
+        try {
+            value = Double.valueOf(getString(""));
+        } catch (NumberFormatException e) {
+            System.out.println("Введено неправильне значння. Спробуйте ще раз");
+            value = getDouble(message); 
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return value;
     }
+
+
+    public static Long getLong() throws IOException {
+        String s = getString(" ");
+        Long value = Long.valueOf(s);
+        return value;
+    }
+
+    public static char getChar(String message) throws IOException {
+        System.out.println(message);
+        String s = getString(" ");
+        return s.charAt(0);
+    }
+
+    public static Integer getInt(String message) {
+        System.out.println(message);
+        String s = "";
+        try {
+            s = getString("");
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        Integer value = Integer.valueOf(s);
+        return value;
+    }
+
+    public static String getString(String string) throws IOException {
+        System.out.println(string);
+        InputStreamReader isr = new InputStreamReader(System.in);
+        BufferedReader br = new BufferedReader(isr);
+        String s = br.readLine();
+        return s;
+    }
+
+
 }
