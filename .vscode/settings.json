@@ -3,6 +3,7 @@
     "masmtasm.ASM.emulator": "dosbox-x",
     "masmtasm.ASM.actions": {
 
+
         "TASM": {
             "baseBundle": "<built-in>/TASM.jsdos",
             "before": [
