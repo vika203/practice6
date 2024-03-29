@@ -9,86 +9,85 @@
 .STACK 100h
 
 .data
-    vdst        db '', 0dh, 0ah, '$'
-    fname       db 'test.txt', 0
-    fhandle     dw ?
-    buffer1     db 100 dup('$')
-    a1          db '0', '$'
-    a2          db '0', '$'
-    helper      db '0', '$'
-
+    vdst    db '', 0dh, 0ah, '$'    ; Буфер для виводу результатів
+    fname   db 'test.txt', 0        ; Ім'я файлу для читання
+    fhandle dw ?                    ; 
+    buffer1 db 100 dup('$')         ; Буфер для зберігання даних з файлу
+    a1      db '0', '$'             ; Змінна для зберігання суми першого типу даних
+    a2      db '0', '$'             ; Змінна для зберігання суми другого типу даних
+    helper  db '0', '$'             ; Допоміжна змінна для перевірки типу даних
 
 .code
 main proc
-    mov ax, @data
-    mov ds, ax
+                mov ax, @data      ; Завантаження адреси сегмента даних у регістр AX
+                mov ds, ax         ; Завантаження адреси сегмента даних у регістр DS
 
-    ;відкриваємо файл
-    mov ah, 3dh
-    lea dx, fname
-    mov al, 2
-    int 21h
-    mov fhandle, ax
+    ; Відкриваємо файл
+                mov ah, 3dh        ; DOS-преривання для відкриття файлу
+                lea dx, fname      ; Передача адреси імені файлу в регістр DX
+                mov al, 2          ; Режим відкриття файлу (читання)
+                int 21h            ; Виклик DOS-преривання
+                mov fhandle, ax    ; Зберігання дескриптора файлу
 
-    ;кладемо дані у буфер
-    mov ah, 3fh
-    mov bx, fhandle
-    lea dx, buffer1
-    add cx, 100
-    int 21h
+    ; Кладемо дані у буфер
+                mov ah, 3fh        ; DOS-преривання для зчитування даних з файлу
+                mov bx, fhandle    ; Передача дескриптора файлу в регістр BX
+                lea dx, buffer1    ; Передача адреси буфера для зберігання даних
+                add cx, 100        ; Кількість байт, яку потрібно зчитати
+                int 21h            ; Виклик DOS-преривання
 
-    mov si, dx
-    jmp looping_a
+                mov si, dx         ; Завантаження адреси буфера в регістр SI
+                jmp looping_a      ; Перехід до початку циклу
 
-looping_a:    
-    mov al, [si]      
-    cmp al, '0'       
-    je  end_of_file   
+    looping_a:  
+                mov al, [si]       ; Завантаження символу з буфера в регістр AL
+                cmp al, '0'        ; Перевірка, чи символ є нулем
+                je  end_of_file    ; Якщо так, переходимо до кінця файлу
 
-    mov ah, 09        
-    mov helper, al
+                mov ah, 09         ; DOS-преривання для виводу символу
+                mov helper, al     ; Зберігання значення в допоміжну змінну
 
-    cmp helper, 'a'
-    je isnext_1_2
+                cmp helper, 'a'    ; Перевірка, чи тип даних "a"
+                je  isnext_1_2     ; Якщо так, переходимо до обробки першого типу даних
 
-    inc si
-    jmp looping_a      
+                inc si             ; Перехід до наступного символу
+                jmp looping_a      ; Повторюємо процес
 
-isnext_1_2:
-    inc si
-    mov al, [si]
-    cmp al, '1'
-    je case_1
-    jne case_2
+    isnext_1_2: 
+                inc si             ; Перехід до наступного символу
+                mov al, [si]       ; Завантаження наступного символу
+                cmp al, '1'        ; Перевірка, чи тип даних "1"
+                je  case_1         ; Якщо так, переходимо до обробки першого типу даних
+                jne case_2         ; Якщо ні, переходимо до обробки другого типу даних
 
-case_1:
-    add si, 2
-    mov al, [si]
-    sub al, '0'
-    add a1, al  
-    jmp looping_a
+    case_1:     
+                add si, 2          ; Перехід до наступного значення після ключа
+                mov al, [si]       ; Завантаження значення типу "1"
+                sub al, '0'        ; Конвертація ASCII в число
+                add a1, al         ; Додавання значення до суми "a1"
+                jmp looping_a      ; Повторення циклу
 
-case_2:
-    add si, 2
-    mov al, [si]
-    sub al, '0'
-    add a2, al  
-    jmp looping_a
+    case_2:     
+                add si, 2          ; Перехід до наступного значення після ключа
+                mov al, [si]       ; Завантаження значення типу "2"
+                sub al, '0'        ; Конвертація ASCII в число
+                add a2, al         ; Додавання значення до суми "a2"
+                jmp looping_a      ; Повторення циклу
         
-end_of_file:
-    mov ah, 09
-    lea dx, a1     
-    int 21h
+    end_of_file:
+                mov ah, 09         ; DOS-преривання для виводу рядка
+                lea dx, a1         ; Завантаження адреси рядка для виводу
+                int 21h            ; Виклик DOS-преривання
 
-    lea dx, vdst
-    int 21h
+                lea dx, vdst       ; Завантаження адреси буфера для виводу результатів
+                int 21h            ; Виклик DOS-преривання
 
-    mov ah, 09
-    lea dx, a2      
-    int 21h
+                mov ah, 09         ; DOS-преривання для виводу рядка
+                lea dx, a2         ; Завантаження адреси рядка для виводу
+                int 21h            ; Виклик DOS-преривання
 
-    mov ah, 4ch
-    int 21h
+                mov ah, 4ch        ; DOS-преривання для завершення програми
+                int 21h            ; Виклик DOS-преривання
 
 main endp
-end
+end main                             ; Завершення програми
